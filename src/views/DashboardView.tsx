@@ -1,4 +1,4 @@
-// src/views/Dashboard.tsx
+// src/views/DashboardView.tsx
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button, ListItem } from "react-native-elements";

@@ -1,12 +1,10 @@
+// src/nav/Navigation.Tsx
 import React, { Component } from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import SigninView from '../views/SigninView';
 import DashboardView from '../views/DashboardView';
-// import CreationTicket from '../views/CreationTicketView';
-// import ModificationTicket from '../views/ModificationTicketView';
-import Home from '../components/Home';
-import Logout from '../components/Logout';
+import CreationTicketView from '../views/CreationTicketView';
+import ModificationTicketView from '../views/ModificationTicketView';
 
 const Stack = createStackNavigator();
 
@@ -27,7 +25,7 @@ export default class Navigation extends Component {
 					component={ DashboardView }
 					options={{ title: "Tableau de bord" }}
 				/>
-				{/* <Stack.Screen
+				<Stack.Screen
 					name="CreationTicket"
 					component={ CreationTicketView }
 					options={{ title: "Créer un ticket" }}
@@ -36,7 +34,7 @@ export default class Navigation extends Component {
 					name="ModificationTicket"
 					component={ ModificationTicketView }
 					options={{ title: "Modifier un ticket" }}
-				/> */}
+				/>
 			</Stack.Navigator>
 		);
 	}

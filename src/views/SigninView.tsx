@@ -1,4 +1,4 @@
-// src/views/Signin.tsx
+// src/views/SigninView.tsx
 import React, { Component } from "react";
 import { StyleSheet, View } from "react-native";
 import { Input, Button } from "react-native-elements";
