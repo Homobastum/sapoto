@@ -4,6 +4,7 @@ Mobile ticket manager
 ## Requirements
 
 1. An android phone with Expo app installed
+2. sapoto-api launched
 
 ## Quick start
 
