@@ -8,7 +8,8 @@
 class AuthInfoReducer {
 	initialState = { 
         token: '', 
-        userId: '' 
+		userId: '',
+		userName: '' 
     };
     
     constructor () {}
@@ -40,6 +41,7 @@ class AuthInfoReducer {
 const initialState = {
 	token: '',
 	userId: '',
+	userName: ''
 };
 
 /**

@@ -106,6 +106,7 @@ function mapStateToProps (state: any) {
 	return {
 		token: state.token,
 		userId: state.userId,
+		userName: state.userName,
 	};
 };
 

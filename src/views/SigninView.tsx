@@ -43,6 +43,7 @@ class SigninView extends Component {
 			};
 
 			sapotoAPI.signin(utilisateur).then((data) => {
+				console.log(data);
 				if (!data.error) {
 					// Enregistrer les informations d'authentification dans le state global
 					const action = {
@@ -130,6 +131,7 @@ function mapStateToProps (state: any) {
 	return {
 		token: state.token,
 		userId: state.userId,
+		userName: state.userName,
 	};
 };
 
