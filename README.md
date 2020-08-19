@@ -14,5 +14,5 @@ packager that will transform your TS code on-the-fly:
 ```
 npm install
 npm start
-
+```
 2. Scan the QRCode !
