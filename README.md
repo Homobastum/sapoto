@@ -3,7 +3,7 @@ Mobile ticket manager
 
 ## Requirements
 
-1. An android phone with Expo app
+1. An android phone with Expo app installed
 
 ## Quick start
 
