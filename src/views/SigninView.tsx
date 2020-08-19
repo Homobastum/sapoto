@@ -26,7 +26,7 @@ class SigninView extends Component {
 
 	/**
 	 * Vérifier que le formulaire est valide:
-	 * - si valide, accéder au dashboard
+	 * - si valide, authentifier l'utilisateur et accéder au dashboard
 	 * - si invalide, afficher les messages d'erreur
 	 * 
 	 * @returns { void }
@@ -42,28 +42,32 @@ class SigninView extends Component {
 				password: this.state.password
 			};
 
-			sapotoAPI.signin(utilisateur)
-				.then(data => {
-					if (!data.error) {
-						console.log(data);
-						// Enregistrer les informations d'authentification dans le state global
-						const action = {
-							type: 'setInfo',
-							value: data,
-						};
-						this.props.dispatch(action);
+			sapotoAPI.signin(utilisateur).then((data) => {
+				if (!data.error) {
+					// Enregistrer les informations d'authentification dans le state global
+					const action = {
+						type: "setInfo",
+						value: data,
+					};
+					this.props.dispatch(action);
 
-						// Supprimer l'historique de navigation et rediriger vers le dashboard (écran d'accueil avec authentification)
-						this.props.navigation.reset({
-							index: 0,
-							routes: [{ name: 'Dashboard' }],
-						});
-					} else {
-						// Afficher les erreurs
-						this.setState({ errorMsg: data.error });
-						this.setState({ chargement: false });
-					}
-				});
+					// Supprimer l'historique de navigation et rediriger vers le dashboard (écran d'accueil avec authentification)
+					this.props.navigation.reset({
+						index: 0,
+						routes: [{ name: "Dashboard" }],
+					});
+				} else {
+					// Afficher les erreurs
+					let msg = data.error.message
+						? data.error.message
+                        : data.error;
+                    
+                    msg = msg || 'Erreur.';
+                    
+					this.setState({ errorMsg: msg });
+					this.setState({ chargement: false });
+				}
+			});
 		} else {
 			// Afficher les erreurs
 			this.setState({ errorMsg: 'Erreur.' });

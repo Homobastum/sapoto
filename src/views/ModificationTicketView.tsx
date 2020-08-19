@@ -14,19 +14,64 @@ class ModificationTicketView extends Component {
 	props: any;
 
 	constructor(props: any) {
-		super(props);
+        super(props);
+        this.checkAuth();
 
 		this.state = {
-			objet: "",
+			sujet: "",
 			description: "",
 			errorMsg: "",
 			chargement: false,
 		};
 	}
 
+	componentDidMount() {
+		this.getTicketById();
+	}
+
+	/**
+	 * Vérifier si l'utilisateur est authentifié:
+	 * - s'il n'est pas authentifié, rediriger vers l'écran d'authentification
+	 */
+	private checkAuth() {
+		if (this.props.token == "") {
+			// Supprimer l'historique de navigation et rediriger vers l'écran d'authentification
+			this.props.navigation.reset({
+				index: 0,
+				routes: [{ name: "Signin" }],
+			});
+		}
+	}
+
+	/**
+	 * Récupérer les informations du ticket à modifier
+	 */
+	getTicketById() {
+		sapotoAPI
+			.getTicketById(this.props.route.params.ticketId, this.props.token)
+			.then((data) => {
+				if (!data.error) {
+					this.setState({
+						sujet: data.sujet,
+						description: data.description,
+					});
+				} else {
+					// Afficher les erreurs
+					let msg = data.error.message
+						? data.error.message
+						: data.error;
+
+					msg = msg || "Erreur.";
+
+					this.setState({ errorMsg: msg });
+					this.setState({ chargement: false });
+				}
+			});
+	}
+
 	/**
 	 * Vérifier que le formulaire est valide:
-	 * - si valide, accéder au dashboard
+	 * - si valide, modifier le ticket et accéder au dashboard
 	 * - si invalide, afficher les messages d'erreur
 	 *
 	 * @returns { void }
@@ -38,13 +83,13 @@ class ModificationTicketView extends Component {
 		if (isValid) {
 			// Modifier le ticket
 			const ticket = {
-				email: this.state.objet,
+				sujet: this.state.sujet,
 				description: this.state.description,
 				demandeur: this.props.userId,
 			};
 
 			sapotoAPI
-				.updateTicket(this.props.ticketId, ticket, this.props.token)
+				.updateTicket(this.props.route.params.ticketId, ticket, this.props.token)
 				.then((data) => {
 					if (!data.error) {
 						// Supprimer l'historique de navigation et rediriger vers le dashboard (écran d'accueil avec authentification)
@@ -54,7 +99,13 @@ class ModificationTicketView extends Component {
 						});
 					} else {
 						// Afficher les erreurs
-						this.setState({ errorMsg: data.error });
+						let msg = data.error.message
+							? data.error.message
+							: data.error;
+
+						msg = msg || "Erreur.";
+
+						this.setState({ errorMsg: msg });
 						this.setState({ chargement: false });
 					}
 				});
@@ -63,16 +114,24 @@ class ModificationTicketView extends Component {
 			this.setState({ errorMsg: "Erreur." });
 			this.setState({ chargement: false });
 		}
-    }
-    
-    private delete () {
-        this.setState({ chargement: true });
+	}
+
+	/**
+	 * Vérifier que le formulaire est valide:
+	 * - si valide, supprimer le ticket et accéder au dashboard
+	 * - si invalide, afficher les messages d'erreur
+	 *
+	 * @returns { void }
+	 */
+	private delete() {
+		this.setState({ chargement: true });
 		let isValid = true; // TODO: validation de formulaire
 
 		if (isValid) {
 			sapotoAPI
-				.deleteTicketById(this.props.ticketId, this.props.token)
+				.deleteTicketById(this.props.route.params.ticketId, this.props.token)
 				.then((data) => {
+                    console.log(data);
 					if (!data.error) {
 						// Supprimer l'historique de navigation et rediriger vers le dashboard (écran d'accueil avec authentification)
 						this.props.navigation.reset({
@@ -81,7 +140,13 @@ class ModificationTicketView extends Component {
 						});
 					} else {
 						// Afficher les erreurs
-						this.setState({ errorMsg: data.error });
+						let msg = data.error.message
+							? data.error.message
+							: data.error;
+
+						msg = msg || "Erreur.";
+
+						this.setState({ errorMsg: msg });
 						this.setState({ chargement: false });
 					}
 				});
@@ -90,7 +155,7 @@ class ModificationTicketView extends Component {
 			this.setState({ errorMsg: "Erreur." });
 			this.setState({ chargement: false });
 		}
-    }
+	}
 
 	render() {
 		return (
@@ -98,15 +163,13 @@ class ModificationTicketView extends Component {
 				<View style={styles.content}>
 					<View style={styles.input}>
 						<Input
-							label="Objet"
+							label="Sujet"
 							labelStyle={styles.label}
 							placeholder="Description courte"
-							leftIcon={
-								<Icon name="envelope" size={24} color="black" />
-							}
 							errorStyle={{ color: "red" }}
 							errorMessage={this.state.errorMsg}
-							onChangeText={(objet) => this.setState({ objet })}
+							onChangeText={(sujet) => this.setState({ sujet })}
+							value={this.state.sujet}
 						/>
 
 						<Input
@@ -115,30 +178,28 @@ class ModificationTicketView extends Component {
 							placeholder="Description longue"
 							multiline={true}
 							numberOfLines={5}
-							leftIcon={
-								<Icon name="envelope" size={24} color="black" />
-							}
 							errorStyle={{ color: "red" }}
 							errorMessage={this.state.errorMsg}
 							onChangeText={(description) =>
 								this.setState({ description })
 							}
+							value={this.state.description}
 						/>
 
-                        <Button
-                            title="Valider"
-                            onPress={() => this.update()}
-                            loading={this.state.chargement}
-                            disabled={this.state.chargement}
-                        />
-                        <Button
-                            title="Supprimer"
-                            onPress={() => this.delete()}
-                            loading={this.state.chargement}
-                            disabled={this.state.chargement}
-                            buttonStyle={styles.buttonDanger}
-                        />
-                    </View>
+						<Button
+							title="Valider"
+							onPress={() => this.update()}
+							loading={this.state.chargement}
+							disabled={this.state.chargement}
+						/>
+						<Button
+							title="Supprimer"
+							onPress={() => this.delete()}
+							loading={this.state.chargement}
+							disabled={this.state.chargement}
+							buttonStyle={styles.buttonDanger}
+						/>
+					</View>
 				</View>
 			</View>
 		);

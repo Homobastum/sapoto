@@ -14,10 +14,11 @@ class CreationTicketView extends Component {
 	props: any;
 
 	constructor(props: any) {
-		super(props);
+        super(props);
+        this.checkAuth();
 
 		this.state = {
-			objet: "",
+			sujet: "",
 			description: "",
 			errorMsg: "",
 			chargement: false,
@@ -25,8 +26,22 @@ class CreationTicketView extends Component {
 	}
 
 	/**
+	 * Vérifier si l'utilisateur est authentifié:
+	 * - s'il n'est pas authentifié, rediriger vers l'écran d'authentification
+	 */
+	private checkAuth() {
+		if (this.props.token == "") {
+			// Supprimer l'historique de navigation et rediriger vers l'écran d'authentification
+			this.props.navigation.reset({
+				index: 0,
+				routes: [{ name: "Signin" }],
+			});
+		}
+	}
+
+	/**
 	 * Vérifier que le formulaire est valide:
-	 * - si valide, accéder au dashboard
+	 * - si valide, créer le ticket et accéder au dashboard
 	 * - si invalide, afficher les messages d'erreur
 	 *
 	 * @returns { void }
@@ -38,9 +53,9 @@ class CreationTicketView extends Component {
 		if (isValid) {
 			// Créer le ticket
 			const ticket = {
-				email: this.state.objet,
-                description: this.state.description,
-                demandeur: this.props.userId
+				sujet: this.state.sujet,
+				description: this.state.description,
+				demandeur: this.props.userId,
 			};
 
 			sapotoAPI.creerTicket(ticket, this.props.token).then((data) => {
@@ -52,7 +67,13 @@ class CreationTicketView extends Component {
 					});
 				} else {
 					// Afficher les erreurs
-					this.setState({ errorMsg: data.error });
+					let msg = data.error.message
+						? data.error.message
+						: data.error;
+
+					msg = msg || "Erreur.";
+
+					this.setState({ errorMsg: msg });
 					this.setState({ chargement: false });
 				}
 			});
@@ -69,15 +90,12 @@ class CreationTicketView extends Component {
 				<View style={styles.content}>
 					<View style={styles.input}>
 						<Input
-							label="Objet"
+							label="Sujet"
 							labelStyle={styles.label}
 							placeholder="Description courte"
-							leftIcon={
-								<Icon name="envelope" size={24} color="black" />
-							}
 							errorStyle={{ color: "red" }}
 							errorMessage={this.state.errorMsg}
-							onChangeText={(objet) => this.setState({ objet })}
+							onChangeText={(sujet) => this.setState({ sujet })}
 						/>
 
 						<Input
@@ -86,9 +104,6 @@ class CreationTicketView extends Component {
 							placeholder="Description longue"
 							multiline={true}
 							numberOfLines={5}
-							leftIcon={
-								<Icon name="envelope" size={24} color="black" />
-							}
 							errorStyle={{ color: "red" }}
 							errorMessage={this.state.errorMsg}
 							onChangeText={(description) =>
@@ -96,12 +111,12 @@ class CreationTicketView extends Component {
 							}
 						/>
 
-                        <Button
-                            title="Valider"
-                            onPress={() => this.valid()}
-                            loading={this.state.chargement}
-                            disabled={this.state.chargement}
-                        />
+						<Button
+							title="Valider"
+							onPress={() => this.valid()}
+							loading={this.state.chargement}
+							disabled={this.state.chargement}
+						/>
 					</View>
 				</View>
 			</View>
